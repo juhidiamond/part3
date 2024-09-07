@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "../../css/style.css";
 import { AddChats, getAllChats, getLoggedInUser } from "../../Db.js";
 
 const Chats = () => {
@@ -8,63 +7,53 @@ const Chats = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   useEffect(() => {
-    getLoggedInUser().then(responseData => {
+    getLoggedInUser().then((responseData) => {
       setLoggedInUser(responseData?.user);
       fetchChatData();
-    })
-  }, [])
+    });
+  }, []);
 
-  const fetchChatData = async() => {
+  const fetchChatData = async () => {
     try {
-      if(loggedInUser){
+      if (loggedInUser) {
         const results = await getAllChats();
-        if(results){
+        if (results) {
           setChatData(results);
-        }else{
+        } else {
           setChatData([]);
         }
-      } 
+      }
     } catch (error) {
       setError(error.message);
     }
   };
 
-  const handleSend = async() => {
+  const handleSend = async () => {
     if (message.trim() === "") {
       setError("Please enter a message");
       return;
     }
 
-    const dateObj = new Date();
-    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-    const day = String(dateObj.getDate()).padStart(2, "0");
-    const year = dateObj.getFullYear();
-    const dateTime = `${day}-${month}-${year} ${dateObj.toLocaleTimeString()}`;
-
     const newMessage = {
       username: loggedInUser.name,
       userid: loggedInUser.id,
-      message: message
+      message: message,
     };
 
     const result = await AddChats(newMessage);
-    if(result){
+    if (result) {
       fetchChatData();
       setError("");
       setMessage("");
-    }else{
+    } else {
       setError(result.message);
     }
-    // const updatedChatData = [...chatData, newMessage];
-    // localStorage.setItem("chatData", JSON.stringify(updatedChatData));
-    // setChatData(updatedChatData);
-    
   };
 
   const handleRefresh = () => {
     fetchChatData();
   };
-  // React Fragments
+
   return (
     <>
       <div className="container-fluid mt-4">
@@ -101,20 +90,20 @@ const Chats = () => {
             onChange={(e) => setMessage(e.target.value)}
           />
           <div className="message-buttons">
-          <button
-            className="btn btn-primary"
-            id="send-btn"
-            onClick={handleSend}
-          >
-            Send
-          </button>
-          <button
-            className="btn btn-secondary"
-            id="refresh-btn"
-            onClick={handleRefresh}
-          >
-            Refresh
-          </button>
+            <button
+              className="btn btn-primary"
+              id="send-btn"
+              onClick={handleSend}
+            >
+              Send
+            </button>
+            <button
+              className="btn btn-secondary"
+              id="refresh-btn"
+              onClick={handleRefresh}
+            >
+              Refresh
+            </button>
           </div>
         </div>
         {error && (
